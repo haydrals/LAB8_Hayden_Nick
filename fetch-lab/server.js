@@ -66,6 +66,47 @@ app.get('/api/math', (req, res) => {
     "result": result
   });
 });
+
+app.get('/api/slow', (req, res) => {
+  setTimeout(() => {
+    res.json({
+      message: "Sorry for the wait!",
+      delayMs: 3000
+    });
+  }, 3000);
+});
+
+app.get('/api/unreliable', (req, res) => {
+  const rand = Math.random();
+  if (rand < 0.5) {
+    res.status(500).json({
+      error: "Server had a bad day. Try again!"
+    });
+  } else {
+    res.json({
+      message: "Lucky! It worked this time.",
+      luckyNumber: Math.floor(Math.random() * 100)
+    });
+  }
+});
+
+app.get('/api/messages', (req, res) => {
+  res.type('text').send('Hello from the server!');
+  let myObj = {
+        currentTIme: new Date().toISOString(),
+        message: "Current server time"
+    }
+    res.type('json').send(myObj);
+});
+
+app.get('/api/messages', (req, res) => {
+  res.type('text').send('Hello from the server!');
+  let myObj = {
+        currentTIme: new Date().toISOString(),
+        message: "Current server time"
+    }
+    res.type('json').send(myObj);
+});
  
 // ---- Your endpoints go above this line ----
  
