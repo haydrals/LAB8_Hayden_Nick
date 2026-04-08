@@ -26,7 +26,7 @@ let nextId = 2;
 let time = new Date().toISOString();
 app.get('/api/time', (req, res) => {
     let myObj = {
-        currentTIme: new Date().toISOString(),
+        currentTime: new Date().toISOString(),
         message: "Current server time"
     }
     res.type('json').send(myObj);
@@ -117,6 +117,12 @@ messages.push(newMsg);
 res.type('json').send(messages);
 
 });
+
+
+app.get('/api/headers', (req, res) => {
+  res.json(req.headers);
+});
+
  
 // ---- Your endpoints go above this line ----
  

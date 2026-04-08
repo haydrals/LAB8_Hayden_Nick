@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fetch Lab</title>
- 
+
   <!-- IMPORT BOOTSTRAP HERE! -->
 </head>
+
 <body class="bg-light">
   <main class="container py-4">
     <h1 class="mb-4">Fetch Lab</h1>
- 
+
     <section id="hello-section" class="card mb-4">
       <div class="card-body">
         <h2 class="h4">1. Hello (text response)</h2>
@@ -18,12 +20,93 @@
         <div id="hello-result" class="alert alert-secondary mt-3 mb-0" role="alert">
           Click the button...
         </div>
+        <br>
       </div>
     </section>
     <!-- You will add more sections below -->
+    <section>
+      <button id="time-btn" class="btn btn-primary">Fetch /time</button>
+      <div id="time-result" class=" alert alert-secondary mt-3 mb-0" role="alert">
+        Click the button...
+      </div>
+    </section>
+
+    <section>
+      <input type="text" id="name">
+      <button id="name-btn" class="btn btn-primary">Fetch /name</button>
+      <div id="name-result" class=" alert alert-secondary mt-3 mb-0" role="alert">
+         Click the button...
+      </div>
+    </section>
+
     <script>
-      // Your fetch code goes here
+      // Put this near the top of your <script> tag
+      function statusCheck(response) {
+        if (response.ok) return response;
+        return response.json()
+          .then(errData => {
+            const msg = errData.error
+              || ('HTTP ' + response.status);
+            throw new Error(msg);
+          })
+          .catch(() => {
+            throw new Error('HTTP ' + response.status);
+          });
+      }
+
+      document.getElementById('hello-btn')
+        .addEventListener('click', () => {
+          fetch('/hello')
+            .then(statusCheck)
+            .then(res => res.text())
+            .then(text => {
+              console.log(text);
+              document.getElementById('hello-result')
+                .textContent = text;
+            })
+            .catch(error => {
+              document.getElementById('hello-result')
+                .textContent = 'Error: '
+                + error.message;
+            });
+        });
+
+      document.getElementById('time-btn')
+        .addEventListener('click', () => {
+          fetch('/api/time')
+            .then(statusCheck)
+            .then(res => res.json())
+            .then(text => {
+              console.log(text);
+              document.getElementById('time-result').textContent = text.message + ": " + text.currentTime;
+
+            })
+            .catch(error => {
+              document.getElementById('time-result')
+                .textContent = 'Error: '
+                + error.message;
+            });
+        });
+
+      const name = document.getElementById(
+        'name-input').value;
+      fetch('/api/greet/' + name)
+        .then(statusCheck)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('name-result')
+                .textContent = data.greeting;
+        })
+        .catch(error => {
+          document.getElementById('name-result')
+                .textContent = 'Error: '
+                + error.message;
+        });
+
+
+
     </script>
   </main>
 </body>
+
 </html>
