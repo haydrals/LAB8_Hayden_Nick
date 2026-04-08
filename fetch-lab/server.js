@@ -1,5 +1,7 @@
 "use strict";
  
+
+
 const express = require('express');
 const app = express();
  
@@ -8,6 +10,12 @@ app.use(express.static('public'));
  
 // Parse JSON request bodies (needed for POST)
 app.use(express.json());
+
+let messages = [
+  { id: 1, text: "Welcome to the message board!", author: "Admin" },
+];
+let nextId = 2;
+
  
 // ---- Your endpoints go below this line ----
  
@@ -91,21 +99,23 @@ app.get('/api/unreliable', (req, res) => {
 });
 
 app.get('/api/messages', (req, res) => {
-  res.type('text').send('Hello from the server!');
-  let myObj = {
-        currentTIme: new Date().toISOString(),
-        message: "Current server time"
-    }
-    res.type('json').send(myObj);
+  
+    res.type('json').send(messages);
 });
 
-app.get('/api/messages', (req, res) => {
-  res.type('text').send('Hello from the server!');
-  let myObj = {
-        currentTIme: new Date().toISOString(),
-        message: "Current server time"
-    }
-    res.type('json').send(myObj);
+app.post('/api/messages', (req, res) => {
+
+const newMsg = {
+  id: nextId,
+  text: req.body.text,
+  author: req.body.author
+}
+nextId++;
+
+messages.push(newMsg);
+
+res.type('json').send(messages);
+
 });
  
 // ---- Your endpoints go above this line ----
