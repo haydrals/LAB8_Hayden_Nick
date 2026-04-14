@@ -29,15 +29,31 @@
       <div id="time-result" class=" alert alert-secondary mt-3 mb-0" role="alert">
         Click the button...
       </div>
+      <br>
     </section>
 
     <section>
-      <input type="text" id="name">
-      <button id="name-btn" class="btn btn-primary">Fetch /name</button>
+      <input type="text" id="name-input">
+      <button id="greet-btn" class="btn btn-primary">Fetch /name</button>
       <div id="name-result" class=" alert alert-secondary mt-3 mb-0" role="alert">
         Click the button...
       </div>
+      <br>
     </section>
+
+    <section>
+      <button id="slow-btn" class="btn btn-primary">Fetch /slow</button>
+      <div id="slow-result" class=" alert alert-secondary mt-3 mb-0" role="alert">
+        Click the button...
+      </div>
+      <br>
+    </section>
+
+    <form id="submitForm">
+      <input type="text" id="msg-author">
+      <input type="text" id="msg-text">
+      <button id="submit-btn" class="btn btn-primary">submit</button>
+    </form>
 
     <script>
       // Put this near the top of your <script> tag
@@ -72,24 +88,28 @@
         });
 
       document.getElementById('time-btn')
-        .addEventListener('click', () => {
-          fetch('/api/time')
-            .then(statusCheck)
-            .then(res => res.json())
-            .then(text => {
-              console.log(text);
-              document.getElementById('time-result').textContent = text.message + ": " + text.currentTime;
-
-            })
-            .catch(error => {
-              document.getElementById('time-result')
-                .textContent = 'Error: '
-                + error.message;
-            });
+        .addEventListener('click', async () => {
+          try {
+            const response =
+              await fetch('/api/time');
+            await statusCheck(response);
+            const data =
+              await response.json();
+            document.getElementById(
+              'time-result').textContent =
+              data.message + ': '
+              + data.currentTime;
+          } catch (error) {
+            document.getElementById(
+              'time-result').textContent =
+              'Error: ' + error.message;
+          }
         });
+
+
+
       document.getElementById('greet-btn').addEventListener('click', () => {
-        const name = document.getElementById(
-          'name-input').value;
+        const name = document.getElementById('name-input').value;
         fetch('/api/greet/' + name)
           .then(statusCheck)
           .then(res => res.json())
@@ -103,6 +123,84 @@
               + error.message;
           });
       });
+
+
+      document.getElementById('slow-btn')
+        .addEventListener('click', () => {
+          const resultDiv =
+            document.getElementById('slow-result');
+          resultDiv.textContent =
+            'Loading... please wait';
+          resultDiv.className =
+            'alert alert-secondary mt-3';
+
+          fetch('/api/slow')
+            .then(statusCheck)
+            .then(res => res.json())
+            .then(data => {
+              resultDiv.textContent = data.message;
+              resultDiv.className =
+                'alert alert-success mt-3';
+            })
+            .catch(error => {
+              resultDiv.textContent =
+                'Error: ' + error.message;
+              resultDiv.className =
+                'alert alert-danger mt-3';
+            });
+        });
+
+        document.getElementById('submitForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          postMessage();
+        });
+
+      async function postMessage() {
+        const text = document.getElementById(
+          'msg-text').value;
+        const author = document.getElementById(
+          'msg-author').value;
+        try {
+          const response = await fetch(
+            '/api/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body: JSON.stringify(
+              { text, author })
+          });
+          if (!response.ok) {
+            const errData =
+              await response.json();
+            throw new Error(errData.error);
+          }
+          const newMsg =
+            await response.json();
+          // Display the newly created message
+          const getResponse = await fetch('/api/messages');
+
+          const messages = await getResponse.json();
+
+          const container = document.getElementById('msg-result');
+          container.innerHTML = '';
+
+          messages.forEach(msg => {
+            const div = document.createElement('div');
+            div.textContent = `${msg.author}: ${msg.text}`
+            container.appendChild(div);
+          });
+
+        } catch (error) {
+          // Display error
+          const resultDiv =
+            document.getElementById('submitForm');
+              document.getElementById(resultDiv).textContent =
+                'Error: ' + error.message;
+                
+        }
+      }
 
 
 
