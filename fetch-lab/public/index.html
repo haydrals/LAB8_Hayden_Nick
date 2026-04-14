@@ -35,7 +35,7 @@
       <input type="text" id="name">
       <button id="name-btn" class="btn btn-primary">Fetch /name</button>
       <div id="name-result" class=" alert alert-secondary mt-3 mb-0" role="alert">
-         Click the button...
+        Click the button...
       </div>
     </section>
 
@@ -87,21 +87,22 @@
                 + error.message;
             });
         });
-
-      const name = document.getElementById(
-        'name-input').value;
-      fetch('/api/greet/' + name)
-        .then(statusCheck)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('name-result')
-                .textContent = data.greeting;
-        })
-        .catch(error => {
-          document.getElementById('name-result')
-                .textContent = 'Error: '
-                + error.message;
-        });
+      document.getElementById('greet-btn').addEventListener('click', () => {
+        const name = document.getElementById(
+          'name-input').value;
+        fetch('/api/greet/' + name)
+          .then(statusCheck)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById('name-result')
+              .textContent = data.greeting;
+          })
+          .catch(error => {
+            document.getElementById('name-result')
+              .textContent = 'Error: '
+              + error.message;
+          });
+      });
 
 
 
